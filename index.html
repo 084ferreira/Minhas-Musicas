@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minha Playlist</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .player-container {
+            background-color: #181818;
+            width: 100%;
+            max-width: 420px;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            font-size: 1.4rem;
+            color: #1db954;
+        }
+        .now-playing {
+            background-color: #242424;
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .now-playing h2 {
+            font-size: 1.1rem;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .now-playing p {
+            font-size: 0.85rem;
+            color: #b3b3b3;
+        }
+        audio {
+            width: 100%;
+            margin-top: 14px;
+            height: 36px;
+            outline: none;
+        }
+        .playlist {
+            list-style: none;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .playlist li {
+            padding: 12px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s;
+            border-bottom: 1px solid #282828;
+        }
+        .playlist li:hover {
+            background-color: #2a2a2a;
+        }
+        .playlist li.active {
+            background-color: #1db95422;
+            color: #1db954;
+            font-weight: bold;
+        }
+        .track-info {
+            display: flex;
+            flex-direction: column;
+        }
+        .track-artist {
+            font-size: 0.8rem;
+            color: #9e9e9e;
+        }
+        .playlist li.active .track-artist {
+            color: #1ed760;
+        }
+    </style>
+</head>
+<body>
+
+<div class="player-container">
+    <div class="header">
+        <h1>Meus Sons</h1>
+    </div>
+
+    <div class="now-playing">
+        <h2 id="current-title">Selecione uma música</h2>
+        <p id="current-artist">---</p>
+        <audio id="audio-player" controls></audio>
+    </div>
+
+    <ul class="playlist" id="playlist"></ul>
+</div>
+
+<script>
+    // EDITE SUAS MÚSICAS AQUI:
+    // Coloque o nome exato do arquivo MP3 (se estiver na mesma pasta) ou o link direto dele.
+    const musicas = [
+        {
+            titulo: "Nome da Música 1",
+            artista: "Artista 1",
+            arquivo: "musica1.mp3"
+        },
+        {
+            titulo: "Nome da Música 2",
+            artista: "Artista 2",
+            arquivo: "musica2.mp3"
+        },
+        {
+            titulo: "Exemplo Online (Teste)",
+            artista: "SoundHelix",
+            arquivo: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
+        }
+    ];
+
+    const audioPlayer = document.getElementById('audio-player');
+    const playlistEl = document.getElementById('playlist');
+    const currentTitle = document.getElementById('current-title');
+    const currentArtist = document.getElementById('current-artist');
+
+    let indiceAtual = 0;
+
+    function carregarPlaylist() {
+        playlistEl.innerHTML = '';
+        musicas.forEach((musica, index) => {
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <div class="track-info">
+                    <span>${index + 1}. ${musica.titulo}</span>
+                    <span class="track-artist">${musica.artista}</span>
+                </div>
+                <span>▶</span>
+            `;
+            li.addEventListener('click', () => tocarMusica(index));
+            playlistEl.appendChild(li);
+        });
+    }
+
+    function tocarMusica(index) {
+        indiceAtual = index;
+        const musica = musicas[index];
+        
+        audioPlayer.src = musica.arquivo;
+        currentTitle.textContent = musica.titulo;
+        currentArtist.textContent = musica.artista;
+        
+        audioPlayer.play();
+        atualizarDestaque();
+    }
+
+    function atualizarDestaque() {
+        const itens = playlistEl.querySelectorAll('li');
+        itens.forEach((item, idx) => {
+            item.classList.toggle('active', idx === indiceAtual);
+        });
+    }
+
+    // Passa para a próxima música automaticamente quando termina
+    audioPlayer.addEventListener('ended', () => {
+        let proximo = indiceAtual + 1;
+        if (proximo >= musicas.length) {
+            proximo = 0; // Volta para a primeira
+        }
+        tocarMusica(proximo);
+    });
+
+    carregarPlaylist();
+</script>
+
+</body>
+</html>
